@@ -19,7 +19,7 @@ const pool = new Pool({
     idleTimeoutMillis: 30000,
 });
 
-//handle arbitrary events
+//handle CONNECTION events
 pool.on('connect', () => {
     console.log('Postgresql connected'); 
 });
@@ -74,7 +74,15 @@ const songList = [
 
 app.get('/artist', (req, res) => {
     console.log(`In /songs GET`);
-    res.send(artistList);
+    let queryText = 'SELECT * FROM "songs" ORDER BY "birthdate";';
+    pool.query(queryText)
+        .then((result) => {
+            res.send(result.rows);
+        })
+        .catch((err) => {
+            console.log(`error making query ${queryText}`, err);
+            res.sendStatus(500);   
+        })
 });
 
 app.post('/artist', (req, res) => {
