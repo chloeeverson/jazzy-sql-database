@@ -3,6 +3,30 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = 5000;
+const pg = require('pg');
+
+// Create a connection to our database
+const Pool = pg.Pool;
+const pool = new Pool({
+    //name of database
+    database: 'jazzy_sql',
+    //where database is
+    host: 'Localhost',
+    port: 5432,
+    //connections at one time
+    max: 10,
+    //30 seconds to try to connect otherwise cancel query
+    idleTimeoutMillis: 30000,
+});
+
+//handle arbitrary events
+pool.on('connect', () => {
+    console.log('Postgresql connected'); 
+});
+//notify if backend error happens
+pool.on('error', (error) => {
+    console.log('Error with postgres pool', error); 
+});
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static('server/public'));
